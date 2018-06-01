@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Images </title>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-family: Arial, sans-serif
+        }
+
+        .images-container {
+            width: 80vw;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .image {
+            height: 150px;
+        }
+
+        .message-wrap {
+            margin: 15px 0;
+        }
+
+        .message-subtitle {
+            margin-right: 30px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="images-container">
+        {{#each images}}
+            <img src="./{{ image }}" alt="{{ altText }}" class="image">
+        {{/each}}
+    </div>
+
+    <div class="messages">
+        <h3>Messages: </h3>
+
+        {{#each messages}}
+            <div class="message-wrap">
+                <span class="message-subtitle">Created:</span> <span>{{ createdAt }}</span> <br>
+                <span class="message-subtitle">Posted by:</span> <span>{{ user }}</span> <br>
+                <span class="message-subtitle">Message:</span> <span>{{ body }}</span> <br>
+            </div>
+        {{/each}}
+
+        {{#unless messages.length}}
+            <span>No messages yet. Write your first massage.</span>
+        {{/unless}}
+    </div>
+</body>
+</html>
