@@ -6,8 +6,7 @@ const express = require('express'),
 
 // dependencies
 const path = require('path'),
-    fs = require('fs'),
-    bodyParser = require('body-parser');
+    fs = require('fs');
 
 // child routes
 const messagesRouter = require('./routes/messages');
@@ -51,6 +50,6 @@ router.get('/', (req, res) => {
         });
     });
 
-router.use('/message', messagesRouter);
+router.use('/messages', messagesRouter);
 
 module.exports = router;

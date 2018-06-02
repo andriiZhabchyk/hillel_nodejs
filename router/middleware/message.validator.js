@@ -15,5 +15,6 @@ module.exports = (req, res, next) => {
     else if (show < 1)  return res.status(400).send({message: 'Show can\'t be less 1.'});
     else if (show > 60)  return res.status(400).send({message: 'Show can\'t be bigger than 60.'});
 
+    req.body.endAt = Date.now() + (show * 1000);
     next();
 };
