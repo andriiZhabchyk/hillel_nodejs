@@ -18,13 +18,12 @@ messagesRouter
     .post(messageMdlws.validate(validationSchemas.addNewMessage), (req, res) => {
         messageModel
             .create(req.body)
-            .then((res) => {
-
+            .then((result) => {
+                res.status(200).send('Successfully add new message.');
             })
             .catch((err) => {
-
+                res.status(500).send({message: 'New message has not been saved.', err});
             });
-        res.end();
     });
 
 messagesRouter

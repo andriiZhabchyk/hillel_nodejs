@@ -25,7 +25,6 @@ router.get('/', (req, res) => {
             if(err) return res.status(400).send({error: err.message});
             res.render('index.hbs', {messages});
         });
-
 });
 
 // main api endpoints
