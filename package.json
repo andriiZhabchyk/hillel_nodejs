@@ -1,5 +1,5 @@
 {
-  "name": "dz_4",
+  "name": "dz_8(9)",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -11,8 +11,10 @@
   "author": "Andrii Zhabchyk",
   "license": "ISC",
   "dependencies": {
+    "celebrate": "^8.0.0",
     "express": "^4.16.3",
     "hbs": "^4.0.1",
-    "jsonfile": "^4.0.0"
+    "joi": "^13.4.0",
+    "mongoose": "^5.1.6"
   }
 }

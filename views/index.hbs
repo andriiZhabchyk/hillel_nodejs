@@ -2,59 +2,182 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> Images </title>
+    <title> Send message </title>
 
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
     <style>
         body {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            font-family: Arial, sans-serif
+            font-family: Arial, sans-serif;
+            padding: 50px;
         }
 
-        .images-container {
-            width: 80vw;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
+        .messages-title {
+            margin-top: 50px;
         }
 
-        .image {
-            height: 150px;
+        .modal-content {
+            padding: 30px;
+            width: 500px;
         }
 
-        .message-wrap {
-            margin: 15px 0;
-        }
-
-        .message-subtitle {
-            margin-right: 30px;
-            font-weight: 600;
+        .sortable-cell {
+            cursor: pointer;
         }
     </style>
 </head>
-<body>
-    <div class="images-container">
-        {{#each images}}
-            <img src="./{{ image }}" alt="{{ altText }}" class="image">
-        {{/each}}
-    </div>
+<body onload="setSortableState()">
+    <div class="container">
+        <div class="row">
+            <form name="form">
+                <div class="form-group">
+                    <input type="text" name="username" class="form-control" placeholder="User name" aria-describedby="basic-addon1">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="message" class="form-control" placeholder="Type new message..." aria-describedby="basic-addon1">
+                </div>
+                <div class="form-group">
+                    <input type="number" name="show" class="form-control" placeholder="Show" aria-describedby="basic-addon1">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="addNewMessage()">Add message</button>
+            </form>
+        </div>
 
-    <div class="messages">
-        <h3>Messages: </h3>
+        <div class="row">
+            <h3 class="messages-title">Messages: </h3>
 
-        {{#each messages}}
-            <div class="message-wrap">
-                <span class="message-subtitle">Posted by:</span> <span>{{ username }}</span> <br>
-                <span class="message-subtitle">Message:</span> <span>{{ message }}</span> <br>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th id="created" onclick="sortMessage(event)" class="sortable-cell">Created</th>
+                    <th id="user" onclick="sortMessage(event)" class="sortable-cell">User</th>
+                    <th>Message</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {{#each messages}}
+                        <tr>
+                            <td id="{{ _id }}" onclick="getMessageDetails(event)">{{ createdAt }}</td>
+                            <td>{{ username }}</td>
+                            <td>{{ message }}</td>
+                        </tr>
+                    {{/each}}
+
+                    {{#unless messages.length}}
+                        <tr>
+                            <td>No messages yet. Write your first massage.</td>
+                        </tr>
+                    {{/unless}}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <pre class="response"></pre>
+                </div>
             </div>
-        {{/each}}
-
-        {{#unless messages.length}}
-            <span>No messages yet. Write your first massage.</span>
-        {{/unless}}
+        </div>
     </div>
+
+    <script>
+        function setSortableState() {
+            const sortableStates = ['sortCreatedState', 'sortUsernameState'];
+
+            sortableStates.forEach((state) => {
+                const createdSortState = localStorage.getItem(state);
+                if (!createdSortState) {
+                    localStorage.setItem(state, 'asc');
+                }
+            });
+        }
+
+        function addNewMessage() {
+            const form = document.forms['form'];
+
+            const xhr = new XMLHttpRequest();
+            const body = 'username=' + encodeURIComponent(form.elements['username'].value) +
+                    '&message=' + encodeURIComponent(form.elements['message'].value) +
+                    '&show=' + encodeURIComponent(form.elements['show'].value);
+
+            xhr.open("POST", '/messages', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+
+            xhr.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    window.location.href = '/';
+                } else if (this.status === 400) {
+                    clearModalContent();
+
+                    $('.modal').modal('show');
+                    $('.modal .response').html(this.response);
+                }
+            };
+
+            xhr.send(body);
+        }
+
+        function getMessageDetails(ev) {
+            const xhr = new XMLHttpRequest();
+
+            xhr.open("GET", `/messages/${ev.target.id}`, true);
+            xhr.send();
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState !== 4) return;
+
+                if (xhr.status !== 200) {
+                    $('.modal').modal('show');
+                    $('.modal .response').html(xhr.status + ': ' + xhr.statusText);
+                } else {
+                    clearModalContent();
+
+                    if (xhr.response === 'null') {
+                        $('.modal .response').html('Message not found. Please, refresh your page for get new mesasges.');
+                    } else {
+                        const response = JSON.parse(xhr.response);
+                        Object.keys(response).forEach((prop) => {
+                            const propView = `<span>${prop}</span>: <span>${response[prop]}</span><br>`;
+                            $('.modal .response').append(propView);
+                        });
+                    }
+                    $('.modal').modal('show');
+                }
+
+            }
+        }
+
+        function clearModalContent() {
+            $('.modal .response').empty();
+        }
+
+        function sortMessage(ev) {
+            const params = (new URL(window.location)).searchParams,
+                createdOrder = params.get('created'),
+                userOrder = params.get('user');
+
+            ev.target.id === 'created' ?
+                    localStorage.setItem('sortCreatedState', createdOrder === 'asc' ? 'desc' : 'asc') :
+                    localStorage.setItem('sortUsernameState', userOrder === 'asc' ? 'desc' : 'asc');
+
+            const createdSortState = localStorage.getItem('sortCreatedState'),
+                userSortState =  localStorage.getItem('sortUsernameState');
+
+            window.location.href = `${window.location.pathname}?created=${createdSortState}&user=${userSortState}`;
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
 </html>
