@@ -28,7 +28,7 @@
             width: 500px;
         }
 
-        .sortable-cell {
+        .pointer-cell {
             cursor: pointer;
         }
     </style>
@@ -56,15 +56,15 @@
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    <th id="created" onclick="sortMessage(event)" class="sortable-cell">Created</th>
-                    <th id="user" onclick="sortMessage(event)" class="sortable-cell">User</th>
+                    <th id="created" onclick="sortMessage(event)" class="pointer-cell">Created</th>
+                    <th id="user" onclick="sortMessage(event)" class="pointer-cell">User</th>
                     <th>Message</th>
                 </tr>
                 </thead>
                 <tbody>
                     {{#each messages}}
                         <tr>
-                            <td id="{{ _id }}" onclick="getMessageDetails(event)">{{ createdAt }}</td>
+                            <td id="{{ _id }}" onclick="getMessageDetails(event)" class="pointer-cell">{{ createdAt }}</td>
                             <td>{{ username }}</td>
                             <td>{{ message }}</td>
                         </tr>
