@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/chat');
 mongoose.set("debug", process.env.ENVIRONMENT === 'development');
 
+
 mongoose.connection.on('open', () => {
    console.log('Mongodb successfully connected.');
 });

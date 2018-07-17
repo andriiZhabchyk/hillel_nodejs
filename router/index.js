@@ -1,47 +1,24 @@
 'use strict';
 
-// express router dependencies
+// express router dependencies && routes
 const express = require('express'),
-    router = express.Router();
+    router = express.Router(),
+    messages = require('./message'),
+    auth = require('./auth');
 
-// child routes
-const messages = require('./messages');
+// middleware
+const mdlw = require('./middlewares');
 
-// db models
-const messageModel = require('./messages/message.model');
+router.get('/', (req, res) => res.redirect('/messages'));
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-
-// main routes
-router.get('/', (req, res) => {
-    messageModel
-        .findActiveMessages()
-        .sort({
-            createdAt: req.query.created === 'asc' ? 1 : -1,
-            username: req.query.user === 'asc' ? 1 : -1
-        })
-        .exec((err, messages) => {
-            if(err) return res.status(400).send({error: err.message});
-            res.render('index.hbs', {messages});
-        });
-});
+// auth endpoints
+router.use('/auth', auth);
 
 // main api endpoints
-router.use('/messages', messages);
+router.use('/messages', mdlw.checkAuth, messages);
 
-// error handler
-router.use((err, req, res, next) => {
-    if (err.name === 'ValidationError') {
-        res.status(400).send(err.details[0].message);
-    } else {
-        console.error(err);
-        res.sendStatus(500);
-    }
-});
-
-router.use('**', (req, res) => {
-    res.status(404).send('Page not found.')
-});
+// error handlers
+router.use(mdlw.errorHandler);
+router.use('**', mdlw.routeHandler);
 
 module.exports = router;

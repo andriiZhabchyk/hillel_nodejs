@@ -26,7 +26,7 @@ const MessageSchema = new Schema({
     }
 }, {
     timestamps: true,
-    collection: 'MessagesCollection',
+    collection: 'messages',
 });
 
 MessageSchema.statics = {

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Send message </title>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            padding: 50px;
+        }
+
+        .login-form {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="login-form col-md-offset-3 col-md-6">
+                <h4 style="text-align: center"><b>Simple Chat</b></h4>
+
+                <form name="form">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">User name</label>
+                        <input type="text" name="username" class="form-control" placeholder="User name" required aria-describedby="basic-addon1">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Password" required aria-describedby="basic-addon1">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="login()">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const form = document.forms['form'];
+
+            const xhr = new XMLHttpRequest();
+            const body = 'username=' + encodeURIComponent(form.elements['username'].value) +
+                    '&password=' + encodeURIComponent(form.elements['password'].value);
+
+            xhr.open("POST", '/auth/login', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+
+            xhr.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    window.location.href = '/';
+                } else if (this.status === 400) {
+                    console.log(this.response);
+                }
+            };
+
+            xhr.send(body);
+        }
+    </script>
+</body>
+</html>
