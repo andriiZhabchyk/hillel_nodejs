@@ -1,14 +1,11 @@
 'use strict';
 
-// express dependencies
 const express = require('express'),
     app = express();
 
-// server configuration
 const PORT = process.env.PORT || 3000,
     router = require('./router');
 
-// app session & passport dependencies
 const passport = require('passport');
 
 /* connect db to project */
@@ -17,8 +14,8 @@ require('./db');
 app.set("views engine", "hbs");
 
 // include express-sessions and passport to routes
-app.use(require('./router/auth/session.configuration'));
-require('./router/auth/passport.configuration')();
+app.use(require('./config/session.configuration'));
+require('./config/passport.configuration')();
 
 // body-parsers
 app.use(express.json());

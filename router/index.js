@@ -1,21 +1,40 @@
 'use strict';
 
-// express router dependencies && routes
 const express = require('express'),
     router = express.Router(),
-    messages = require('./message'),
-    auth = require('./auth');
+    posts = require('./posts'),
+    auth = require('./auth'),
+    files = require('./files'),
+    comments = require('./comments');
 
-// middleware
 const mdlw = require('./middlewares');
 
-router.get('/', (req, res) => res.redirect('/messages'));
+const fs = require('fs'),
+    path = require('path');
+
+router.get('/', (req, res) => {
+    res.redirect('/posts');
+});
+
+router.get('/static/*', (req, res) => {
+    const requirePath = req.url.split('/'),
+        pathToFile = path.join(...requirePath);
+
+    const fileStream = fs.createReadStream(pathToFile, {highWaterMark: 512});
+    fileStream.pipe(res);
+});
 
 // auth endpoints
 router.use('/auth', auth);
 
 // main api endpoints
-router.use('/messages', mdlw.checkAuth, messages);
+router.use('/files', files);
+
+// main api endpoints
+router.use('/posts', mdlw.checkAuth, posts);
+
+// main api endpoints
+router.use('/comments', mdlw.checkAuth, comments);
 
 // error handlers
 router.use(mdlw.errorHandler);

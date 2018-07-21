@@ -11,6 +11,7 @@
   "author": "Andrii Zhabchyk",
   "license": "ISC",
   "dependencies": {
+    "app-root-path": "^2.1.0",
     "bcrypt-nodejs": "0.0.3",
     "celebrate": "^8.0.0",
     "connect-mongo": "^2.0.1",
@@ -19,6 +20,7 @@
     "hbs": "^4.0.1",
     "joi": "^13.4.0",
     "mongoose": "^5.1.6",
+    "multer": "^1.3.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0"
   }

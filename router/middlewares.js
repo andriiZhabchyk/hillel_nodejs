@@ -17,8 +17,10 @@ module.exports.errorHandler = (err, req, res, next) => {
     if (err.name === 'ValidationError') {
         res.status(400).send(err.details[0].message);
     } else {
-        console.error(err);
-        res.sendStatus(500);
+        if (!err.status) {
+            return res.sendStatus(500);
+        }
+        res.status(err.status).send(err.message);
     }
 };
 

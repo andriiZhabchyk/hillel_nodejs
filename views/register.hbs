@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Write about... </title>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            padding: 50px;
+        }
+
+        .login-form {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="login-form col-md-offset-3 col-md-6">
+                <h4 style="text-align: center"><b>Write about ...</b></h4>
+
+                <form name="form">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">User name</label>
+                        <input type="text" name="username" class="form-control" placeholder="User name" required aria-describedby="basic-addon1">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="Email" required aria-describedby="basic-addon1">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Password" required aria-describedby="basic-addon1">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Avatar</label>
+                        <input type="file"
+                               name="avatar"
+                               class="form-control"
+                               placeholder="Avatar"
+                               required
+                               onchange="uploadAvatar()"
+                               aria-describedby="basic-addon1">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">About yourself</label>
+                        <input name="description"
+                               class="form-control"
+                               placeholder="About yourself..."
+                               required
+                               aria-describedby="basic-addon1">
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="register()">Register</button>
+                </form>
+
+                <p style="margin: 10px 0">Already registered? <a href="/auth/login">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function register() {
+            const form = document.forms['form'];
+
+            const xhr = new XMLHttpRequest();
+            const body = 'username=' + encodeURIComponent(form.elements['username'].value) +
+                    '&email=' + encodeURIComponent(form.elements['email'].value) +
+                    '&description=' + encodeURIComponent(form.elements['description'].value) +
+                    '&avatar=' + encodeURIComponent(localStorage.getItem('avatar')) +
+                    '&password=' + encodeURIComponent(form.elements['password'].value);
+
+            xhr.open("POST", '/auth/register', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            xhr.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    window.location.href = '/';
+                } else if (this.status === 400) {
+                    console.log(this.response);
+                }
+            };
+
+            xhr.send(body);
+        }
+
+        function uploadAvatar() {
+            const file = document.forms['form'].elements['avatar'].files[0];
+            if (!file) {
+                return;
+            }
+
+            const xhr = new XMLHttpRequest(),
+                formData = new FormData();
+            formData.append("user_avatar", file);
+            xhr.open("POST", '/files/upload', true);
+
+            xhr.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    const response = JSON.parse(this.response);
+                    localStorage.setItem('avatar', response.avatar);
+                } else if (this.status === 400) {
+                    console.log(this.response);
+                }
+            };
+            xhr.send(formData);
+        }
+    </script>
+</body>
+</html>

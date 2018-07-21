@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> Send message </title>
+    <title> Write about ... </title>
 
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
@@ -16,11 +16,33 @@
             flex-direction: column;
             justify-content: center;
             font-family: Arial, sans-serif;
-            padding: 50px;
         }
 
-        .messages-title {
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 50px;
+            margin-bottom: 30px;
+            background-color: aliceblue;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+
+        .main {
+            width: 800px;
+        }
+
+        .posts-section-title {
+            margin: 50px 0 30px;
+        }
+
+        .post-title {
             margin-top: 50px;
+            font-weight: bold;
+        }
+
+        .post-body {
+            font-size: 12px;
+            margin: 15px 0 15px 30px;
         }
 
         .modal-content {
@@ -28,55 +50,73 @@
             width: 500px;
         }
 
-        .pointer-cell {
-            cursor: pointer;
+        .user {
+            margin: 0 30px;
+        }
+
+        .posts {
+            height: 650px;
+            overflow-y: auto;
+        }
+
+        .avatar {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
         }
     </style>
 </head>
-<body onload="setSortableState()">
-    <div class="container">
+<body>
+    <header class="header">
+        <h3>Write about ... </h3>
+        <div style="display: flex; align-items: center">
+            <div class="user">
+                <img src="/static/{{user.avatar}}" class="avatar" alt="avatar">
+
+                <span style="margin: 0 10px">{{ user.username }}</span>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container main">
         <div class="row">
             <form name="form">
                 <div class="form-group">
-                    <input type="text" name="username" class="form-control" placeholder="User name" aria-describedby="basic-addon1">
+                    <input type="text" name="title" class="form-control" placeholder="Post title" aria-describedby="basic-addon1">
                 </div>
+
                 <div class="form-group">
-                    <input type="text" name="message" class="form-control" placeholder="Type new message..." aria-describedby="basic-addon1">
+                    <input name="body"
+                           class="form-control"
+                           placeholder="Type new post..."
+                           aria-describedby="basic-addon1">
                 </div>
+
                 <div class="form-group">
-                    <input type="number" name="show" class="form-control" placeholder="Show" aria-describedby="basic-addon1">
+                    <input type="text" name="tegs" class="form-control" placeholder="Tegs" aria-describedby="basic-addon1">
                 </div>
-                <button type="button" class="btn btn-primary" onclick="addNewMessage()">Add message</button>
+                <button type="button" class="btn btn-primary" onclick="addNewPost()">Post article</button>
             </form>
         </div>
 
-        <div class="row">
-            <h3 class="messages-title">Messages: </h3>
+        <div class="row posts">
+            <h3 class="posts-section-title">Articles </h3>
 
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th id="created" onclick="sortMessage(event)" class="pointer-cell">Created</th>
-                    <th id="user" onclick="sortMessage(event)" class="pointer-cell">User</th>
-                    <th>Message</th>
-                </tr>
-                </thead>
-                <tbody>
-                    {{#each messages}}
-                        <tr>
-                            <td id="{{ _id }}" onclick="getMessageDetails(event)" class="pointer-cell">{{ createdAt }}</td>
-                            <td>{{ username }}</td>
-                            <td>{{ message }}</td>
-                        </tr>
-                    {{/each}}
+            {{#each posts}}
+                <div class="post">
+                    <h4 class="post-title"><a href="/posts/{{_id}}">{{ title }}</a></h4>
+                    <i>by {{ by.[0].username }}</i> <img src="/static/{{by.[0].avatar}}" class="avatar" alt="avatar">
+                    <p class="post-body"> {{ body }}</p>
+                </div>
+            {{/each}}
 
-                    {{#unless messages.length}}
-                        <tr>
-                            <td>No messages yet. Write your first massage.</td>
-                        </tr>
-                    {{/unless}}
-                </tbody>
-            </table>
+            {{#unless posts.length}}
+                <div>
+                    <p>No posts in blog yet. Write your first article.</p>
+                </div>
+            {{/unless}}
         </div>
 
         <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -89,26 +129,15 @@
     </div>
 
     <script>
-        function setSortableState() {
-            const sortableStates = ['sortCreatedState', 'sortUsernameState'];
-
-            sortableStates.forEach((state) => {
-                const createdSortState = localStorage.getItem(state);
-                if (!createdSortState) {
-                    localStorage.setItem(state, 'asc');
-                }
-            });
-        }
-
-        function addNewMessage() {
+        function addNewPost() {
             const form = document.forms['form'];
 
             const xhr = new XMLHttpRequest();
-            const body = 'username=' + encodeURIComponent(form.elements['username'].value) +
-                    '&message=' + encodeURIComponent(form.elements['message'].value) +
-                    '&show=' + encodeURIComponent(form.elements['show'].value);
+            const body = 'title=' + encodeURIComponent(form.elements['title'].value) +
+                    '&body=' + encodeURIComponent(form.elements['body'].value) +
+                    '&tags=' + encodeURIComponent(form.elements['tegs'].value);
 
-            xhr.open("POST", '/message', true);
+            xhr.open("POST", '/posts', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
 
@@ -116,8 +145,6 @@
                 if (this.readyState === 4 && this.status === 200) {
                     window.location.href = '/';
                 } else if (this.status === 400) {
-                    clearModalContent();
-
                     $('.modal').modal('show');
                     $('.modal .response').html(this.response);
                 }
@@ -126,53 +153,11 @@
             xhr.send(body);
         }
 
-        function getMessageDetails(ev) {
+        function logout() {
             const xhr = new XMLHttpRequest();
-
-            xhr.open("GET", `/messages/${ev.target.id}`, true);
+            xhr.open('POST', '/logout', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.send();
-
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState !== 4) return;
-
-                if (xhr.status !== 200) {
-                    $('.modal').modal('show');
-                    $('.modal .response').html(xhr.status + ': ' + xhr.statusText);
-                } else {
-                    clearModalContent();
-
-                    if (xhr.response === 'null') {
-                        $('.modal .response').html('Message not found. Please, refresh your page for get new mesasges.');
-                    } else {
-                        const response = JSON.parse(xhr.response);
-                        Object.keys(response).forEach((prop) => {
-                            const propView = `<span>${prop}</span>: <span>${response[prop]}</span><br>`;
-                            $('.modal .response').append(propView);
-                        });
-                    }
-                    $('.modal').modal('show');
-                }
-
-            }
-        }
-
-        function clearModalContent() {
-            $('.modal .response').empty();
-        }
-
-        function sortMessage(ev) {
-            const params = (new URL(window.location)).searchParams,
-                createdOrder = params.get('created'),
-                userOrder = params.get('user');
-
-            ev.target.id === 'created' ?
-                    localStorage.setItem('sortCreatedState', createdOrder === 'asc' ? 'desc' : 'asc') :
-                    localStorage.setItem('sortUsernameState', userOrder === 'asc' ? 'desc' : 'asc');
-
-            const createdSortState = localStorage.getItem('sortCreatedState'),
-                userSortState =  localStorage.getItem('sortUsernameState');
-
-            window.location.href = `${window.location.pathname}?created=${createdSortState}&user=${userSortState}`;
         }
     </script>
 

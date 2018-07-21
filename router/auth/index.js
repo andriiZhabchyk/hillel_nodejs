@@ -15,15 +15,21 @@ const passport = require('passport');
 authRouter
     .route('/login')
     .get((req, res) => {
-        // console.log(req.user);
-        // console.log(req.session);
         res.render('login.hbs');
     })
 
     .post(authMdlw.validate(login), passport.authenticate('local-login', {
         successRedirect: '/',
-        failureRedirect: '/auth/login',
-        failureFlash: true
+    }));
+
+authRouter
+    .route('/register')
+    .get((req, res) => {
+        res.render('register.hbs');
+    })
+
+    .post(passport.authenticate('local-signup', {
+        successRedirect: '/'
     }));
 
 module.exports = authRouter;
