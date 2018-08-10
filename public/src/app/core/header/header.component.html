@@ -1,0 +1,68 @@
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between">
+  <div fxLayout="30" fxFlex="row" fxLayoutAlign=" center">
+    <button type="button"
+            mat-icon-button
+            class="visible-md"
+            (click)="toggleSidenav()"
+            *ngIf="(user$ | async)?.roles.includes('admin')">
+      <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+    </button>
+
+    <div class="nav-brand">
+      <a routerLink="/">
+        Write about ...
+      </a>
+    </div>
+  </div>
+
+  <span class="nav-spacer"></span>
+
+  <div fxFlex="30" fxLayout="row" fxLayoutAlign="end center">
+    <div *ngIf="user$ | async; else authLinks">
+
+      <button color="primary"
+              style="margin: 0 10px"
+              mat-icon-button
+              [matMenuTriggerFor]="profile"
+              *ngIf="!(user$ | async)?.roles.includes('admin')">
+
+        <img *ngIf="(user$ | async)?.avatar; else noAvatar"
+             mat-card-avatar
+             [src]="'/img/' + (user$ | async)?.avatar"
+             alt="">
+      </button>
+
+      <mat-menu #profile="matMenu">
+        <button mat-menu-item
+                routerLink="/user/profile">
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+
+        <button mat-menu-item
+                routerLink="/user/activity">
+          <mat-icon>view_list</mat-icon>
+          <span>Activity</span>
+        </button>
+      </mat-menu>
+
+      <button mat-icon-button (click)="onLogout()">
+        <mat-icon>exit_to_app</mat-icon>
+      </button>
+    </div>
+  </div>
+</mat-toolbar>
+
+<ng-template #authLinks>
+  <div fxLayout="row" fxLayoutAlign="space-between">
+    <a mat-button routerLink="/auth/sign-in">Sign-in </a>
+    <i style="font-size: 11px; margin: 0 5px; align-self: center">or</i>
+    <a mat-button routerLink="/auth/sign-up"> Sign-up</a>
+  </div>
+</ng-template>
+
+<ng-template #noAvatar>
+  <img mat-card-avatar
+       [src]="'/img/no_avatar.png'"
+       alt="">
+</ng-template>

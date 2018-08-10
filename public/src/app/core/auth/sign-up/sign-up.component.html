@@ -1,0 +1,64 @@
+<mat-card class="sign-card" fxLayout="column" fxLayoutAlign="center">
+  <mat-card-title class="card-title">Sign-Up</mat-card-title>
+
+  <mat-card-content>
+    <form #signUpForm="ngForm" fxLayout="column" class="sign-form">
+
+      <mat-form-field color="accent">
+        <input matInput
+               name="username"
+               type="text"
+               required
+               [(ngModel)]="user.username"
+               placeholder="Name">
+      </mat-form-field>
+
+      <mat-form-field color="accent">
+        <input matInput
+               name="email"
+               type="email"
+               required
+               [(ngModel)]="user.email"
+               placeholder="E-mail">
+      </mat-form-field>
+
+      <mat-form-field color="accent">
+        <input matInput
+               name="password"
+               type="password"
+               required
+               [(ngModel)]="user.password"
+               (keyup)="checkPassword()"
+               placeholder="Password">
+      </mat-form-field>
+
+      <mat-form-field color="accent">
+        <input matInput
+               name="confirmPassword"
+               type="password"
+               required
+               ngModel
+               (keyup)="checkPassword()"
+               placeholder="Confirm password">
+      </mat-form-field>
+    </form>
+
+    <p style="margin: 15px 0">Already registered? <a routerLink="/auth/sign-in" style="color: #5cb85c">Sign In</a></p>
+  </mat-card-content>
+
+  <mat-card-actions fxLayout="row" fxLayoutAlign="center">
+    <div fxFlex="70" fxLayout="row" fxLayoutAlign="space-between">
+      <button mat-button
+              color="accent"
+              routerLink="/">
+        Back to Home
+      </button>
+
+      <button mat-stroked-button
+              [disabled]="signUpForm.invalid || !passwordConfirm"
+              color="accent" (click)="onSignUp()">
+        SIGN-UP NOW
+      </button>
+    </div>
+  </mat-card-actions>
+</mat-card>

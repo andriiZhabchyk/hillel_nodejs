@@ -1,0 +1,44 @@
+<mat-card class="sign-card" fxLayout="column" fxLayoutAlign="center">
+    <mat-card-title class="card-title">Sign-In</mat-card-title>
+
+    <mat-card-content>
+      <form #signInForm="ngForm" fxLayout="column" class="sign-form">
+
+        <mat-form-field color="accent">
+          <input matInput
+                 name="email"
+                 type="email"
+                 required
+                 [(ngModel)]="user.email"
+                 placeholder="E-mail">
+        </mat-form-field>
+
+        <mat-form-field color="accent">
+          <input matInput
+                 name="password"
+                 type="password"
+                 required
+                 [(ngModel)]="user.password"
+                 placeholder="Password">
+        </mat-form-field>
+      </form>
+
+      <p style="margin: 15px 0">Not registered? <a routerLink="/auth/sign-up" style="color: #5cb85c">Create an account</a></p>
+    </mat-card-content>
+
+    <mat-card-actions fxLayout="row" fxLayoutAlign="center">
+      <div fxFlex="70" fxLayout="row" fxLayoutAlign="space-between">
+        <button mat-button
+                color="accent"
+                routerLink="/">
+          Back to Home
+        </button>
+
+        <button mat-stroked-button
+                [disabled]="signInForm.invalid"
+                color="accent" (click)="onSignIn()">
+          SIGN-IN NOW
+        </button>
+      </div>
+    </mat-card-actions>
+</mat-card>

@@ -10,6 +10,7 @@ module.exports = expressSession({
     resave: false,
     saveUninitialized: false,
     unset: 'destroy',
+    secure: false,
     store: new MongoStore({
         mongooseConnection: mongoose.connection
     })

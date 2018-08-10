@@ -3,38 +3,46 @@
 const express = require('express'),
     commentRouter = express.Router();
 
-const mdlw = require('../middlewares'),
-    {addNewComment} = require('./comment.validation');
+const mdlw = require('../middlewares');
 
-const ObjectId = require('mongoose').Types.ObjectId,
-    CommentModel = require('./comment.model'),
-    PostsModel = require('../posts/post.model');
+const {
+    getOneCommentValidation,
+    addNewCommentValidation,
+    updateCommentValidation,
+    deleteCommentValidation
+} = require('./comments.validation');
+
+const {
+    getOneCommentCtrl,
+    addCommentCtrl,
+    updateCommentCtrl,
+    deleteCommentCtrl
+} = require('./comments.controller');
 
 commentRouter
     .route('/')
-    .post(mdlw.validate(addNewComment), (req, res) => {
-        CommentModel
-            .create({
-                addedBy: req.user._id,
-                body: req.body.comment
-            }, (err, result) => {
-                if (err) {
-                    return res.status(500).send('Comment has not been saved.');
-                }
 
-                console.log(result);
+    /**
+     * @api {POST} /comments Add new comment
+     * **/
+    .post(mdlw.validate(addNewCommentValidation), addCommentCtrl);
 
-                PostsModel
-                    .findOne({_id: new ObjectId(req.body.postId)})
-                    .exec((err, post) => {
-                        if (err) {
-                            return res.status(500).send('Comment has not been saved.');
-                        }
-                        post.comments.push(result._id);
-                        post.save();
-                    });
-                res.status(200).send('Successfully add new comment.');
-            });
-    });
+commentRouter
+    .route('/:id')
+
+    /**
+     * @api {GET} /comments Get one comment
+     * **/
+    .get(mdlw.validate(getOneCommentValidation), getOneCommentCtrl)
+
+    /**
+     * @api {PUT} /comments Update comment
+     * **/
+    .put(mdlw.validate(updateCommentValidation), updateCommentCtrl)
+
+    /**
+     * @api {DELETE} /comments Delete comment
+     * **/
+    .delete(mdlw.validate(deleteCommentValidation), deleteCommentCtrl);
 
 module.exports = commentRouter;

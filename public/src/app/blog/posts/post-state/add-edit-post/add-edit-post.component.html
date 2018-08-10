@@ -1,0 +1,83 @@
+<mat-card class="add-post-card">
+  <mat-card-header>
+    <mat-card-title>ADD NEW ARTICLE</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content fxLayout="row">
+    <mat-vertical-stepper [linear]="true" fxFlex (selectionChange)="onStepChange($event)" #stepper>
+      <mat-step label="Post details" [editable]="!postId">
+        <form #postForm="ngForm" fxLayout="column">
+          <mat-form-field color="accent">
+            <input matInput
+                   name="title"
+                   required
+                   [(ngModel)]="post.title"
+                   placeholder="Title">
+          </mat-form-field>
+
+          <mat-form-field color="accent">
+            <textarea matInput
+                      name="body"
+                      required
+                      [(ngModel)]="post.body"
+                      placeholder="Type your post ..."></textarea>
+          </mat-form-field>
+
+          <mat-form-field color="accent">
+            <input matInput
+                   name="tags"
+                   (keyup)="onAddTag($event)"
+                   placeholder="Tags">
+            <mat-hint>*Press enter for add new tag.</mat-hint>
+          </mat-form-field>
+
+          <span *ngFor="let tag of post.tags">{{ tag }}</span>
+        </form>
+      </mat-step>
+
+      <mat-step label="Article image (optional)" [editable]="!postId">
+        <span *ngIf="!postId">Please, add your post detail before.</span>
+
+        <div class="file-upload">
+          <td-file-upload #singleFileUpload
+                          defaultColor="accent"
+                          activeColor="warn"
+                          cancelColor="primary"
+                          [(ngModel)]="files"
+                          [disabled]="!postId || successUpload"
+                          (select)="selectEvent($event)"
+                          (upload)="uploadEvent($event)">
+            <mat-icon>file_upload</mat-icon><span>{{ singleFileUpload.value?.name }}</span>
+            <ng-template td-file-input-label>
+              <mat-icon>attach_file</mat-icon>
+              <span>Choose a file...</span>
+            </ng-template>
+          </td-file-upload>
+
+          <span *ngIf="fileSelected" style="color: #9d9d9d; font-size: 12px;">
+            *Click button for upload image to server.
+          </span>
+        </div>
+      </mat-step>
+    </mat-vertical-stepper>
+
+  </mat-card-content>
+
+  <mat-card-actions fxLayout="row" fxLayoutAlign="end">
+    <button *ngIf="selectedStep === 0"
+            mat-stroked-button
+            color="accent"
+            [disabled]="postForm.invalid"
+            (click)="onAddPost()">
+      PUBLISH ARTICLE
+    </button>
+
+    <button *ngIf="postId"
+            mat-stroked-button
+            color="accent"
+            routerLink="/posts">
+      FINISH
+    </button>
+  </mat-card-actions>
+</mat-card>
+

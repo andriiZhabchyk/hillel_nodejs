@@ -1,0 +1,16 @@
+:host {
+  padding: 50px;
+}
+
+.post-image {
+  height: 300px;
+  object-fit: cover;
+}
+
+.post-card {
+  min-width: 80vw;
+}
+
+.user-avatar {
+  margin: 0 10px;
+}

@@ -1,0 +1,74 @@
+<mat-card class="post-card">
+  <mat-card-header>
+    <img *ngIf="!!post?.addedBy?.avatar; else noAvatar"
+         mat-card-avatar
+         [src]="'/img/' + post?.addedBy?.avatar"
+         alt="">
+
+    <mat-card-title>{{ post?.title }}</mat-card-title>
+
+    <mat-card-subtitle>
+      <i style="font-size: 12px; color: #9d9d9d;"> by </i>
+      <b> {{ post?.addedBy?.username }} </b>
+      <i style="font-size: 12px; color: #9d9d9d;"> {{ post?.createdAt | date:'medium' }} </i>
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <img mat-card-image
+       class="post-image"
+       [src]="'/img/' + post?.image"
+       alt="">
+
+  <mat-card-content>
+    <p>
+      {{ post?.body }}
+    </p>
+
+    <mat-divider></mat-divider>
+
+    <mat-list fxLayout="column">
+      <mat-list-item *ngFor="let comment of post?.comments">
+        <img *ngIf="!!comment?.addedBy?.avatar; else noAvatar"
+             matListAvatar
+             [src]="'/img/' + comment?.addedBy?.avatar"
+             alt="">
+        <h3 matLine> {{ comment?.addedBy?.username }} </h3>
+
+        <div matLine fxLayout="row">
+          <div fxFlex="20" style="font-size: 12px; color: #9d9d9d;"> {{ comment?.createdAt | date:'medium' }} </div>
+          <div fxFlex="80"> {{comment?.body}} </div>
+        </div>
+      </mat-list-item>
+
+      <mat-list-item style="margin-top: 30px">
+        <mat-form-field fxFlex="100"
+                        color="accent">
+          <input matInput
+                 #commentInput
+                 (keyup)="onAddComment($event)"
+                 placeholder="Type your comment ...">
+
+          <button mat-icon-button
+                  matSuffix
+                  (click)="onAddComment($event)">
+            <mat-icon>send</mat-icon>
+          </button>
+
+        </mat-form-field>
+      </mat-list-item>
+    </mat-list>
+
+  </mat-card-content>
+
+  <mat-card-actions>
+    <!--<button mat-button>LIKE</button>-->
+    <!--<button mat-button>SHARE</button>-->
+  </mat-card-actions>
+</mat-card>
+
+<ng-template #noAvatar>
+  <img mat-card-avatar
+       class="user-avatar"
+       [src]="'/img/no_avatar.png'"
+       alt="">
+</ng-template>

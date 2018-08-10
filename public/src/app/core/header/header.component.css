@@ -1,0 +1,10 @@
+.nav-brand {
+  width: 215px;
+  text-align: center;
+}
+
+.nav-brand a {
+  text-decoration: none;
+  color: white;
+}
+

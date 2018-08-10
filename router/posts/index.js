@@ -1,95 +1,137 @@
 'use strict';
 
-// express dependencies
 const express = require('express'),
     postRouter = express.Router();
 
 const mdlw = require('../middlewares');
-const {addNewPost} = require('./post.validation');
 
-const mongoose = require('mongoose'),
-    ObjectId = mongoose.Types.ObjectId,
-    postModel = require('./post.model'),
-    commentModel = require('../comments/comment.model');
+const {
+    addPostValidation,
+    updatePostValidation,
+    deletePostValidation
+} = require('./posts.validation');
+
+const {
+    getPosts,
+    addNewPost,
+    getPost,
+    updatePost,
+    deletePost
+} = require('./posts.controller');
 
 postRouter
     .route('/')
+
     /*
     *  get all posts
     * */
-    .get((req, res) => {
-        postModel
-            .aggregate([
-                {
-                    $lookup:
-                        {
-                            from: "users",
-                            localField: "addedBy",
-                            foreignField: "_id",
-                            as: "by"
-                        }
-                }
-            ])
-            .exec((err, posts) => {
-                if(err) return res.status(400).send({error: err.message});
+    .get(getPosts)
 
-                res.render('index.hbs', {
-                    user: req.user,
-                    posts
-                });
-            });
-    })
-
-    /*
-    *  add new posts to db
-    * */
-    .post(mdlw.validate(addNewPost), (req, res) => {
-        postModel
-            .create({
-                addedBy: req.user._id,
-                ...req.body
-            })
-            .then((result) => {
-                res.status(200).send('Successfully add new post.');
-            })
-            .catch((err) => {
-                res.status(500).send({message: 'New posts has not been saved.', err});
-            });
-    });
+    /**
+     * @api {POST} /api/posts Add new post
+     * @apiVersion 0.0.1
+     * @apiGroup Posts
+     * @apiPermission all
+     *
+     * @apiParam {String} title Post title.
+     * @apiParam {String} body Post body.
+     * @apiParam {String} tags Post tags.
+     *
+     * @apiParamExample {json} Request-Example:
+     *     {
+     *          "title": "TEst title"
+     *          "body": "TEst body"
+     *          "tags": ["#teg1, #teg2"]
+     *    }
+     *
+     **/
+    .post(mdlw.auth, mdlw.validate(addPostValidation), addNewPost);
 
 postRouter
     .route('/:id')
 
-    /*
-    *  Get one post by id
-    * */
-    .get((req, res) => {
-        postModel
-            .aggregate([
-                {
-                    $match: {_id: new ObjectId(req.params.id)}
-                },
-                {
-                    $lookup:
-                        {
-                            from: "users",
-                            localField: "addedBy",
-                            foreignField: "_id",
-                            as: "by"
-                        }
-                }
-            ])
-            .exec((err, post) => {
-                commentModel
-                    .find({_id: {$in: post.comments}}, (err, comments) => {
-                       console.log(comments);
-                    });
-                // console.log(post);
-                res.render('post.hbs', {
-                    user: req.user,
-                    post: post[0]
-                });
-            });
-    });
+    /**
+    *  @api {GET} /api/posts/:id Get one post
+    *  @apiVersion 1.0.0
+    *  @apiGroup Posts
+    *  @apiPermission all
+    *
+    *  @apiParamExample {json} Request-Example:
+    *     {
+    *       "id": "5b58e6ef281c8a6bfba6f7fd"
+    *     }
+    *
+     * @apiSuccessExample {json} Success-Response:
+     *   HTTP/1.1 200 OK
+     *      {
+     *          "_id" : ObjectId("5b58e6ef281c8a6bfba6f7fd"),
+     *          "show" : true,
+     *          "comments" : [
+     *              ObjectId("5b59bb832c466d1d8d518ef0"),
+     *              ObjectId("5b59be9a0dfa08242f61c082"),
+     *              ObjectId("5b59beb4dc52b9264868bc38"),
+     *              ObjectId("5b59bfb6da3c48268580330c")
+     *          ],
+     *          "tags" : [
+     *              "teg"
+     *          ],
+     *          "addedBy" : ObjectId("5b58de77fc6d8d5a3c89bdd9"),
+     *          "title" : "TEst",
+     *          "body" : "sdfsdf sdfsdfs dfsd",
+     *          "createdAt" : ISODate("2018-07-25T21:09:03.225Z"),
+     *          "updatedAt" : ISODate("2018-07-26T12:33:58.887Z"),
+     *          "__v" : 4
+     *      }
+     **/
+    .get(mdlw.validate(addPostValidation), getPost)
+
+    /**
+     * @api {PUT} /api/posts/:id Update one post
+     * @apiVersion 1.0.0
+     * @apiGroup Posts
+     * @apiPermission user
+     *
+     * @apiParam {String} [title] Post title (Required without body).
+     * @apiParam {String} [body] Post body (Required without title).
+     *
+     * @apiParamExample {json} First-Request-Example:
+     *     {
+     *         "title": "Test title"
+     *     }
+     * @apiParamExample {json} Second-Request-Example:
+     *     {
+     *         "body": "Post test for testing"
+     *     }
+     *
+     * @apiParamExample {json} Third-Request-Example:
+     *     {
+     *         "title": "Test title"
+     *         "body": "Post test for testing"
+     *     }
+     *
+     * @apiSuccessExample {status} Success-Response:
+     *      HTTP/1.1 200 OK
+     *
+     * **/
+    .put(mdlw.auth, mdlw.validate(updatePostValidation), updatePost)
+
+    /**
+     * @api {delete} /api/posts/:id Delete post
+     * @apiVersion 1.0.0
+     * @apiGroup Posts
+     * @apiPermission user
+     *
+     * @apiParam {String} [id] Post ObjectID for delete.
+     *
+     * @apiParamExample {json} First-Request-Example:
+     *     {
+     *         "id": "5b6de0a8ebf0e61ef9bbfd59"
+     *     }
+     *
+     * @apiSuccessExample {status} Success-Response:
+     *      HTTP/1.1 200 OK
+     *
+     * **/
+    .delete(mdlw.auth, mdlw.validate(deletePostValidation), deletePost);
 
 module.exports = postRouter;

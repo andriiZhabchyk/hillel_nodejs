@@ -1,0 +1,81 @@
+<div fxLayout="row" class="posts-content">
+
+  <div fxFlex="90" fxLayout="row">
+    <div *ngIf="!posts.length" fxFlex="80">
+      Not articles yet.
+    </div>
+
+    <div fxLayout="row wrap" fxLayoutGap="10px">
+      <div fxFlex *ngFor="let post of posts">
+        <mat-card class="post-card">
+          <mat-card-header>
+            <img *ngIf="!!post?.addedBy?.avatar; else noAvatar"
+                 mat-card-avatar
+                 [src]="'/img/' + post?.addedBy?.avatar"
+                 alt="">
+
+            <mat-card-title>{{ post?.title }}</mat-card-title>
+            <mat-card-subtitle><i>by </i> {{ post?.by?.username }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <img mat-card-image
+               [src]="'/img/' + post?.image"
+               alt="">
+
+          <mat-card-content>
+            <p>
+              {{ post?.body }}
+            </p>
+
+            <mat-chip-list matLine *ngFor="let tag of post?.tags; let i = index;">
+              <mat-chip>{{ tag }}</mat-chip>
+            </mat-chip-list>
+          </mat-card-content>
+
+          <mat-card-actions fxLayout="row" fxLayoutAlign="space-between center">
+            <button mat-stroked-button
+                    color="accent"
+                    [routerLink]="'/post/view/' + post?._id">
+              READ MORE
+            </button>
+
+            <mat-icon style="margin: 0 20px"
+                      [matBadge]="post.comments.length"
+                      matBadgeColor="accent">chat_bubble_outline</mat-icon>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <div fxFlex>
+    <mat-card class="add-new-card" *ngIf="!(user$ | async)?.roles.includes('admin')">
+      <mat-card-content>
+        <p style="font-size: 16px; color: #5cb85c">Have a new story?!</p>
+        <p *ngIf="!(user$ | async)">Sign-in or Create a new account and publish your story.</p>
+      </mat-card-content>
+
+      <div *ngIf="user$ | async; else signInBtn">
+        <button mat-stroked-button
+                routerLink="/post/add"
+                color="accent">
+          WRITE NOW
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</div>
+
+<ng-template #signInBtn>
+  <button mat-stroked-button
+          routerLink="/auth/sign-in"
+          color="accent">
+    SIGN-IN
+  </button>
+</ng-template>
+
+<ng-template #noAvatar>
+  <img mat-card-avatar
+       [src]="'/img/no_avatar.png'"
+       alt="">
+</ng-template>

@@ -1,0 +1,12 @@
+:host {
+  padding: 50px 30px;
+}
+
+.add-post-card {
+  width: 500px;
+  padding: 30px 50px;
+}
+
+.file-upload {
+  margin: 20px 0;
+}

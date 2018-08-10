@@ -9,13 +9,18 @@ const multer = require('multer'),
     path = require('path'),
     rootPath = require('app-root-path').path;
 
+const {
+    uploadAvatar,
+    uploadPostImage
+} = require('./files.controller');
+
 const allowedFileTypes = ['jpeg', 'jpg', 'png', 'gif'];
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const destinationPath = path.join(rootPath, 'static');
+        const destinationPath = path.join(rootPath, 'static', 'img');
         if(!fs.existsSync(destinationPath)) fs.mkdirSync(destinationPath);
-        cb(null, path.join(rootPath, 'static'));
+        cb(null, path.join(rootPath, 'static', 'img'));
     },
     filename: function (req, file, cb) {
         const fileMimeType = file.mimetype;
@@ -24,17 +29,18 @@ const storage = multer.diskStorage({
         if (!allowedFileTypes.includes(fileType[1])) {
             return cb({message: 'Not allowed file type.'})
         }
-        cb(null, `${file.fieldname}-${Date.now()}.${fileType[1]}`);
+        cb(null, `${file.fieldname}-${req.params.id || req.user._id}.${fileType[1]}`);
     }
 });
 
 const upload = multer({storage});
-// upload.single('avatar')
 
 fileRouter
-    .route('/upload')
-    .post(upload.single('user_avatar'), (req, res) => {
-        res.status(200).send({avatar: req.file.filename});
-    });
+    .route('/avatar')
+    .post(upload.single('user_avatar'), uploadAvatar);
+
+fileRouter
+    .route('/images/:id')
+    .post(upload.single('post_images'), uploadPostImage);
 
 module.exports = fileRouter;

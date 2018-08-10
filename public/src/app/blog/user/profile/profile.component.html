@@ -1,0 +1,75 @@
+<div fxLayout="row" fxLayoutAlign="center center">
+  <mat-card class="user-card" fxLayout="column" fxLayoutAlign="center">
+    <mat-card-content>
+      <form #profileForm="ngForm" fxLayout="column" class="sign-form">
+
+        <mat-form-field color="accent">
+          <input matInput
+                 name="Name"
+                 type="text"
+                 required
+                 [(ngModel)]="user.username"
+                 placeholder="Name">
+        </mat-form-field>
+
+        <mat-form-field color="accent">
+          <input matInput
+                 name="email"
+                 type="email"
+                 required
+                 [(ngModel)]="user.email"
+                 placeholder="E-mail">
+        </mat-form-field>
+
+        <mat-form-field color="accent">
+          <input matInput
+                 name="password"
+                 type="password"
+                 required
+                 [(ngModel)]="user.password"
+                 placeholder="Password">
+        </mat-form-field>
+
+        <mat-form-field color="accent">
+          <input matInput
+                 name="Description"
+                 type="text"
+                 [(ngModel)]="user.descr"
+                 placeholder="About yourself ...">
+        </mat-form-field>
+      </form>
+
+      <td-file-upload #singleFileUpload
+                      defaultColor="accent"
+                      activeColor="warn"
+                      cancelColor="primary"
+                      [(ngModel)]="files"
+                      (upload)="uploadEvent($event)">
+        <mat-icon>file_upload</mat-icon><span>{{ singleFileUpload.value?.name }}</span>
+
+        <ng-template td-file-input-label>
+          <mat-icon>account_box</mat-icon>
+          <span>Update your avatar...</span>
+        </ng-template>
+      </td-file-upload>
+    </mat-card-content>
+
+    <mat-card-actions fxLayout="row" fxLayoutAlign="center">
+      <div fxFlex="40" fxLayout="row" fxLayoutAlign="space-between">
+        <button mat-button
+                color="accent"
+                routerLink="/">
+          Back to Home
+        </button>
+
+        <button mat-stroked-button
+                [disabled]="profileForm.invalid"
+                color="accent"
+                (click)="onUpdateProfile()">
+          UPDATE PROFILE
+        </button>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+
+</div>

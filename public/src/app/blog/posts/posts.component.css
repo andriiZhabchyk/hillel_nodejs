@@ -1,0 +1,12 @@
+.posts-content {
+  padding: 30px;
+}
+
+.post-card {
+  max-width: 350px;
+  margin: 15px;
+}
+
+.add-new-card {
+  margin: 15px;
+}

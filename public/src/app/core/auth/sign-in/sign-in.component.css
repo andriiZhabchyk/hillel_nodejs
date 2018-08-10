@@ -1,0 +1,16 @@
+:host {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sign-card {
+  width: 400px;
+  padding: 50px 30px;
+}
+
+.card-title {
+  text-align: center;
+  color: #5cb85c;
+}

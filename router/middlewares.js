@@ -3,12 +3,15 @@
 const { celebrate } = require('celebrate');
 
 module.exports.validate = (schema) => {
-    return celebrate(schema);
+    return celebrate(schema, {stripUnknown: true});
 };
 
-module.exports.checkAuth = (req, res, next) => {
+module.exports.auth = (req, res, next) => {
     if (!req.isAuthenticated()) {
-        return res.redirect('/auth/login');
+        return next({
+            status: 401,
+            message: 'Unauthorized'
+        });
     }
     next();
 };
@@ -25,5 +28,9 @@ module.exports.errorHandler = (err, req, res, next) => {
 };
 
 module.exports.routeHandler = (req, res) => {
-    res.status(404).send('Page not found.')
+    res.status(404).send('Api endpoint not found.')
+};
+
+module.exports.getStaticFiles = (req, res, file) => {
+    res.render(file);
 };

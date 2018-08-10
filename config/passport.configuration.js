@@ -3,12 +3,12 @@
 const passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy;
 
-const UserModel = require('../router/users/user.model');
+const UserModel = require('../router/user/user.model');
 
 const bcrypt = require('bcrypt-nodejs');
 
 module.exports = () => {
-    passport.use('local-login', new LocalStrategy({
+    passport.use('local-signin', new LocalStrategy({
             usernameField: 'email',
             passwordField: 'password',
             passReqToCallback: true
@@ -76,7 +76,14 @@ module.exports = () => {
     });
 
     passport.deserializeUser(function(id, cb) {
-        cb(null, id);
+        UserModel
+            .findById(id)
+            .exec((err, user) => {
+                if (err) {
+                    return cb(err, null);
+                }
+                cb(null, user);
+            });
     });
 
 };
