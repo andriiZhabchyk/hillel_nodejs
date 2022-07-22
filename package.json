@@ -11,7 +11,7 @@
   "author": "Andrii Zhabchyk",
   "license": "ISC",
   "dependencies": {
-    "file-type": "^8.0.0",
+    "file-type": "^16.5.4",
     "lodash": "^4.17.19"
   }
 }
